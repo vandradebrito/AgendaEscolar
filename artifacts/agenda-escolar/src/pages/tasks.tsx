@@ -15,8 +15,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+function parseDateLocal(dateStr: string): Date {
+  return parse(dateStr, "yyyy-MM-dd", new Date());
+}
 
 export default function Tasks() {
   const [filter, setFilter] = useState<ListTasksStatus>("pending");
@@ -61,7 +65,7 @@ export default function Tasks() {
         title, 
         description, 
         priority,
-        dueDate: dueDate ? dueDate.toISOString() : undefined,
+        dueDate: dueDate ? format(dueDate, "yyyy-MM-dd") : undefined,
         subjectId: subjectId !== "none" ? Number(subjectId) : undefined 
       } 
     }, {
@@ -207,8 +211,8 @@ export default function Tasks() {
                       </span>
                     )}
                     {task.dueDate && (
-                      <span className={`flex items-center px-2 py-0.5 rounded-full ${new Date(task.dueDate) < new Date() && !task.completed ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
-                        Vencimento: {new Date(task.dueDate).toLocaleDateString('pt-BR')}
+                      <span className={`flex items-center px-2 py-0.5 rounded-full ${parseDateLocal(task.dueDate) < new Date() && !task.completed ? 'bg-destructive/10 text-destructive' : 'bg-muted text-muted-foreground'}`}>
+                        Vencimento: {parseDateLocal(task.dueDate).toLocaleDateString('pt-BR')}
                       </span>
                     )}
                   </div>

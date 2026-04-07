@@ -19,7 +19,7 @@ export function Layout({ children }: LayoutProps) {
     { href: "/dashboard", label: "Dashboard", icon: Home },
     { href: "/horario", label: "Horário", icon: Clock },
     { href: "/tarefas", label: "Tarefas", icon: CheckSquare },
-    { href: "/eventos", label: "Eventos", icon: Calendar },
+    { href: "/eventos", label: "Eventos e Provas", icon: Calendar },
     { href: "/materias", label: "Matérias", icon: BookOpen },
     { href: "/anotacoes", label: "Anotações", icon: StickyNote },
   ];
