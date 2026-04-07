@@ -36,6 +36,8 @@ const DAYS = [
   { id: 3, name: "Quarta" },
   { id: 4, name: "Quinta" },
   { id: 5, name: "Sexta" },
+  { id: 6, name: "Sábado" },
+  { id: 0, name: "Domingo" },
 ];
 
 type EditingEntry = {
@@ -154,8 +156,8 @@ export default function Schedule() {
     return (
       <div className="space-y-6">
         <h1 className="text-3xl font-bold">Horário Semanal</h1>
-        <div className="grid grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map((i) => (
+        <div className="grid grid-cols-7 gap-4">
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
             <Skeleton key={i} className="h-96" />
           ))}
         </div>
@@ -176,7 +178,7 @@ export default function Schedule() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-7 gap-4">
         {DAYS.map((day) => {
           const dayEntries =
             schedule
