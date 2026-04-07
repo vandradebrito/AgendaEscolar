@@ -2,14 +2,18 @@ import { useGetDashboardSummary, getGetDashboardSummaryQueryKey } from "@workspa
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckSquare, Calendar, BookOpen, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUser } from "@clerk/react";
 
 export default function Dashboard() {
   const { data: summary, isLoading } = useGetDashboardSummary({ query: { queryKey: getGetDashboardSummaryQueryKey() } });
+  const { user } = useUser();
+
+  const greeting = user?.firstName ? `Olá, ${user.firstName}!` : "Olá!";
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold">Resumo de Hoje</h1>
+        <h1 className="text-3xl font-bold">{greeting}</h1>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 rounded-xl" />)}
         </div>
@@ -22,7 +26,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Olá! Aqui está o seu dia</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{greeting} Aqui está o seu dia</h1>
         <p className="text-muted-foreground mt-2">Veja o que temos programado para hoje e próximos dias.</p>
       </div>
 
