@@ -31,10 +31,14 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { format, parseISO } from "date-fns";
+import { format, parse } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+
+function parseDateLocal(dateStr: string): Date {
+  return parse(dateStr, "yyyy-MM-dd", new Date());
+}
 
 type EventType = "exam" | "presentation" | "fieldtrip" | "holiday" | "other";
 
@@ -111,7 +115,7 @@ export default function Events() {
       title: ev.title,
       description: ev.description ?? "",
       subjectId: ev.subjectId ? ev.subjectId.toString() : "none",
-      date: parseISO(ev.date),
+      date: parseDateLocal(ev.date),
       type: ev.type as EventType,
     });
     setIsOpen(true);
@@ -197,10 +201,10 @@ export default function Events() {
               <Card key={event.id} className="p-5 flex gap-4 group hover:border-primary/40 transition-colors">
                 <div className="flex flex-col items-center justify-center bg-muted/50 rounded-lg p-3 min-w-[72px]">
                   <span className="text-xs font-bold text-muted-foreground uppercase">
-                    {parseISO(event.date).toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}
+                    {parseDateLocal(event.date).toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}
                   </span>
                   <span className="text-2xl font-bold text-foreground">
-                    {parseISO(event.date).getDate() + 1}
+                    {parseDateLocal(event.date).getDate()}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
