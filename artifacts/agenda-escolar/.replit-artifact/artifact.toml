@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Agenda Escolar"
+version = "1.0.0"
+id = "artifacts/agenda-escolar"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18816
+
+[services.development]
+run = "pnpm --filter @workspace/agenda-escolar run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/agenda-escolar", "run", "build" ]
+publicDir = "artifacts/agenda-escolar/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18816"
+BASE_PATH = "/"
