@@ -39,6 +39,7 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    sourcemap: false, // evita warnings de source maps quebrados em deps externas no build da Vercel
   },
   server: {
     port,
