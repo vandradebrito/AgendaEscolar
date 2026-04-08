@@ -13,8 +13,7 @@ router.post("/login", async (req, res) => {
     return;
   }
 
-  const client = clerkClient();
-  const clerkUser = await client.users.getUser(userId);
+  const clerkUser = await clerkClient.users.getUser(userId);
   const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
   const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") || email;
   const imageUrl = clerkUser.imageUrl ?? null;
