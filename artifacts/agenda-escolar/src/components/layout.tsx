@@ -1,19 +1,22 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { Calendar, CheckSquare, Clock, BookOpen, StickyNote, Home, LogOut, UserCircle } from "lucide-react";
+import { Calendar, CheckSquare, Clock, BookOpen, StickyNote, Home, LogOut, UserCircle, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser, useClerk } from "@clerk/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { clearAccessCache } from "@/components/access-gate";
 
 interface LayoutProps {
   children: ReactNode;
+  role?: string;
 }
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children, role }: LayoutProps) {
   const [location] = useLocation();
   const { user } = useUser();
   const { signOut } = useClerk();
+  const isAdmin = role === "admin";
 
   const links = [
     { href: "/dashboard", label: "Início", icon: Home },
@@ -22,6 +25,7 @@ export function Layout({ children }: LayoutProps) {
     { href: "/eventos", label: "Eventos", icon: Calendar },
     { href: "/materias", label: "Matérias", icon: BookOpen },
     { href: "/anotacoes", label: "Notas", icon: StickyNote },
+    ...(isAdmin ? [{ href: "/admin", label: "Admin", icon: ShieldCheck }] : []),
   ];
 
   const initials = user
@@ -82,7 +86,7 @@ export function Layout({ children }: LayoutProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
-              onClick={() => signOut({ redirectUrl: "/" })}
+              onClick={() => { clearAccessCache(); signOut({ redirectUrl: "/" }); }}
               title="Sair"
             >
               <LogOut className="h-4 w-4" />
@@ -111,7 +115,7 @@ export function Layout({ children }: LayoutProps) {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground"
-              onClick={() => signOut({ redirectUrl: "/" })}
+              onClick={() => { clearAccessCache(); signOut({ redirectUrl: "/" }); }}
               title="Sair"
             >
               <LogOut className="h-4 w-4" />

@@ -6,12 +6,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import { Layout } from "@/components/layout";
+import { AccessGate, clearAccessCache } from "@/components/access-gate";
 import Dashboard from "@/pages/dashboard";
 import Schedule from "@/pages/schedule";
 import Tasks from "@/pages/tasks";
 import Events from "@/pages/events";
 import Subjects from "@/pages/subjects";
 import Notes from "@/pages/notes";
+import Admin from "@/pages/admin";
 import { BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -85,18 +87,104 @@ function HomeRedirect() {
   );
 }
 
-function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
+function ProtectedRoute({ component: Component, role }: { component: React.ComponentType; role: string }) {
+  return (
+    <Show when="signed-in">
+      <AccessGate>
+        {() => (
+          <Layout role={role}>
+            <Component />
+          </Layout>
+        )}
+      </AccessGate>
+    </Show>
+  );
+}
+
+function AdminRoute({ role }: { role: string }) {
+  if (role !== "admin") return <Redirect to="/dashboard" />;
+  return (
+    <Show when="signed-in">
+      <Layout role={role}>
+        <Admin />
+      </Layout>
+    </Show>
+  );
+}
+
+function AuthGuard({ children }: { children: (role: string) => React.ReactNode }) {
   return (
     <>
       <Show when="signed-in">
-        <Layout>
-          <Component />
-        </Layout>
+        <AccessGate>{children}</AccessGate>
       </Show>
       <Show when="signed-out">
         <Redirect to="/" />
       </Show>
     </>
+  );
+}
+
+function AppRoutes() {
+  return (
+    <Switch>
+      <Route path="/" component={HomeRedirect} />
+      <Route path="/sign-in/*?" component={SignInPage} />
+      <Route path="/sign-up/*?" component={SignUpPage} />
+      <Route path="/dashboard">
+        {() => (
+          <AuthGuard>
+            {(role) => <Layout role={role}><Dashboard /></Layout>}
+          </AuthGuard>
+        )}
+      </Route>
+      <Route path="/horario">
+        {() => (
+          <AuthGuard>
+            {(role) => <Layout role={role}><Schedule /></Layout>}
+          </AuthGuard>
+        )}
+      </Route>
+      <Route path="/tarefas">
+        {() => (
+          <AuthGuard>
+            {(role) => <Layout role={role}><Tasks /></Layout>}
+          </AuthGuard>
+        )}
+      </Route>
+      <Route path="/eventos">
+        {() => (
+          <AuthGuard>
+            {(role) => <Layout role={role}><Events /></Layout>}
+          </AuthGuard>
+        )}
+      </Route>
+      <Route path="/materias">
+        {() => (
+          <AuthGuard>
+            {(role) => <Layout role={role}><Subjects /></Layout>}
+          </AuthGuard>
+        )}
+      </Route>
+      <Route path="/anotacoes">
+        {() => (
+          <AuthGuard>
+            {(role) => <Layout role={role}><Notes /></Layout>}
+          </AuthGuard>
+        )}
+      </Route>
+      <Route path="/admin">
+        {() => (
+          <AuthGuard>
+            {(role) => role === "admin"
+              ? <Layout role={role}><Admin /></Layout>
+              : <Redirect to="/dashboard" />
+            }
+          </AuthGuard>
+        )}
+      </Route>
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
@@ -110,6 +198,7 @@ function ClerkQueryClientCacheInvalidator() {
       const userId = user?.id ?? null;
       if (prevUserIdRef.current !== undefined && prevUserIdRef.current !== userId) {
         qc.clear();
+        clearAccessCache();
       }
       prevUserIdRef.current = userId;
     });
@@ -117,23 +206,6 @@ function ClerkQueryClientCacheInvalidator() {
   }, [addListener, qc]);
 
   return null;
-}
-
-function AppRoutes() {
-  return (
-    <Switch>
-      <Route path="/" component={HomeRedirect} />
-      <Route path="/sign-in/*?" component={SignInPage} />
-      <Route path="/sign-up/*?" component={SignUpPage} />
-      <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
-      <Route path="/horario" component={() => <ProtectedRoute component={Schedule} />} />
-      <Route path="/tarefas" component={() => <ProtectedRoute component={Tasks} />} />
-      <Route path="/eventos" component={() => <ProtectedRoute component={Events} />} />
-      <Route path="/materias" component={() => <ProtectedRoute component={Subjects} />} />
-      <Route path="/anotacoes" component={() => <ProtectedRoute component={Notes} />} />
-      <Route component={NotFound} />
-    </Switch>
-  );
 }
 
 function ClerkProviderWithRoutes() {
