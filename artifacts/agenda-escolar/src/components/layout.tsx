@@ -16,12 +16,12 @@ export function Layout({ children }: LayoutProps) {
   const { signOut } = useClerk();
 
   const links = [
-    { href: "/dashboard", label: "Dashboard", icon: Home },
+    { href: "/dashboard", label: "Início", icon: Home },
     { href: "/horario", label: "Horário", icon: Clock },
     { href: "/tarefas", label: "Tarefas", icon: CheckSquare },
-    { href: "/eventos", label: "Eventos e Provas", icon: Calendar },
+    { href: "/eventos", label: "Eventos", icon: Calendar },
     { href: "/materias", label: "Matérias", icon: BookOpen },
-    { href: "/anotacoes", label: "Anotações", icon: StickyNote },
+    { href: "/anotacoes", label: "Notas", icon: StickyNote },
   ];
 
   const initials = user
@@ -30,6 +30,8 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex min-h-screen w-full bg-background">
+
+      {/* ── Desktop sidebar ── */}
       <aside className="w-64 flex-shrink-0 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-primary flex items-center gap-2">
@@ -54,7 +56,7 @@ export function Layout({ children }: LayoutProps) {
                 )}
               >
                 <Icon className="h-5 w-5" />
-                {link.label}
+                {link.label === "Eventos" ? "Eventos e Provas" : link.label}
               </Link>
             );
           })}
@@ -88,13 +90,65 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </aside>
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="flex-1 overflow-auto p-4 md:p-8">
-          <div className="max-w-5xl mx-auto w-full h-full animate-in fade-in slide-in-from-bottom-4 duration-500">
+
+      {/* ── Main content ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        {/* Mobile top header */}
+        <header className="flex md:hidden items-center justify-between px-4 py-3 border-b bg-background sticky top-0 z-10">
+          <h1 className="text-lg font-bold text-primary flex items-center gap-2">
+            <BookOpen className="h-5 w-5" />
+            Agenda Escolar
+          </h1>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.imageUrl} alt={user?.firstName ?? ""} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                {initials || <UserCircle className="h-4 w-4" />}
+              </AvatarFallback>
+            </Avatar>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground"
+              onClick={() => signOut({ redirectUrl: "/" })}
+              title="Sair"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 overflow-auto p-4 md:p-8 pb-24 md:pb-8">
+          <div className="max-w-5xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500">
             {children}
           </div>
-        </div>
-      </main>
+        </main>
+
+        {/* Mobile bottom tab bar */}
+        <nav className="flex md:hidden fixed bottom-0 left-0 right-0 z-20 bg-background border-t border-border">
+          {links.map((link) => {
+            const Icon = link.icon;
+            const isActive = location === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "flex-1 flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium transition-colors",
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                )}
+              >
+                <Icon className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
+                <span>{link.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }
